@@ -1,0 +1,83 @@
+name: DAST Scan
+2
+ 
+3
+on:
+4
+push:
+5
+branches:
+6
+- dast
+7
+ 
+8
+jobs:
+9
+dast:
+10
+runs-on: ubuntu-latest
+11
+ 
+12
+steps:
+13
+- name: Checkout
+14
+uses: actions/checkout@v4
+15
+ 
+16
+- name: OWASP ZAP Baseline Scan
+17
+uses: zaproxy/action-baseline@v0.12.0
+18
+with:
+19
+target: 'http://SEU_ALVO'
+20
+ 
+21
+- name: Install Nuclei
+22
+run: |
+23
+curl -s https://api.github.com/repos/projectdiscovery/nuclei/releases/latest \
+24
+| grep browser_download_url \
+25
+| grep linux_amd64.zip \
+26
+| cut -d '"' -f 4 \
+27
+| wget -qi -
+28
+unzip nuclei*_linux_amd64.zip
+29
+sudo mv nuclei /usr/local/bin/
+30
+ 
+31
+- name: Run Nuclei
+32
+run: |
+33
+nuclei -u http://https://github.com/RodneyYamane/appvuln.git
+34
+ 
+35
+- name: Install Nikto
+36
+run: |
+37
+sudo apt update
+38
+sudo apt install -y nikto
+39
+ 
+40
+- name: Run Nikto
+41
+run: |
+42
+nikto -h http://https://github.com/RodneyYamane/appvuln.git
